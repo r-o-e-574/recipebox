@@ -1,0 +1,18 @@
+{% if not author %}
+<h1>Looks like this Author doesn't exist :'(</h1>
+{% else %}
+    <h1>{{author.name}}</h1>
+    <h2>About the author:</h2>
+    <p>{{author.bio}}</p>
+    <br>
+    <h3>Recipes by this author:</h3>
+    {% for recipe in recipes %}
+    <ul>
+        <li>
+           Recipe name: <a href="/recipe/{{recipe.id}}/">{{ recipe.title }}</a> 
+           <br>
+           Summary: {{ recipe.description }}
+        </li>
+    </ul>
+    {%endfor%}
+{% endif %}
