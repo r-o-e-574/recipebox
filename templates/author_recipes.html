@@ -9,9 +9,7 @@
     {% for recipe in recipes %}
     <ul>
         <li>
-           Recipe name: <a href="/recipe/{{recipe.id}}/">{{ recipe.title }}</a> 
-           <br>
-           Summary: {{ recipe.description }}
+           Recipe name: <a href="/recipe/{{recipe.id}}/">{{ recipe.title }}</a>
         </li>
     </ul>
     {%endfor%}

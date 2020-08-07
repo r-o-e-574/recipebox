@@ -17,7 +17,6 @@ class Recipe(models.Model):
     description = models.TextField()
     time_required = models.CharField(max_length=20)
     instructions = models.TextField()
-    post_date = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
         return f"{self.title} - {self.author.name}"
