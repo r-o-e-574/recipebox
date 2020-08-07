@@ -3,13 +3,6 @@
     {% for recipes in recipe %}
         <li>
             <a href="/recipe/{{ recipes.id }}/">{{recipes.title}}</a> - by {{recipes.author.name}} | {{ recipes.post_date }}
-                <ul>
-                    <li>
-                       Cook Time: {{ recipes.time_required }}
-                       <br>
-                       Summary: {{ recipes.description }}
-                    </li>
-                </ul>
         </li>
     {%endfor%}
 </ul>
