@@ -1,7 +1,14 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse
- 
+# used this https://stackoverflow.com/questions/23557697/django-how-to-let-permissiondenied-exception-display-the-reason
+#in reference on how to display an error to user if they don't have permission
+from django.http import HttpResponseForbidden
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.models import User
+
 from recipe.models import Recipe, Author
-from recipe.forms import AddRecipeForm, AddAuthorForm
+from recipe.forms import AddRecipeForm, AddAuthorForm, LoginForm
 # Create your views here.
 
 def index_view(request):
@@ -16,10 +23,10 @@ def recipe_detail(request, recipe_id):
 def author_recipes(request, author_id):
     selected_author = Author.objects.filter(id=author_id).first()
     recipe_list = Recipe.objects.filter(author=selected_author)
-    # breakpoint()
     return render(request, "author_recipes.html", {"recipes": recipe_list, "author": selected_author})
 
 
+@login_required
 def recipe_form_view(request):
     if request.method == "POST":
         form = AddRecipeForm(request.POST)
@@ -27,22 +34,50 @@ def recipe_form_view(request):
             data = form.cleaned_data
             Recipe.objects.create(
                 title = data.get('title'),
-                author = data.get('author'),
+                author = request.user.author,
                 description = data.get('description'),
                 time_required = data.get('time_required'),
                 instructions = data.get('instructions'),
             )
-            return HttpResponseRedirect(reverse("homepage", args=[add_recipe.id]))
+            return HttpResponseRedirect(reverse("homepage"))
         
     form = AddRecipeForm()
     return render(request, "generic_form.html", {"form": form})
 
 
+@login_required
 def author_form_view(request):
-    if request.method =="POST":
-       form =AddAuthorForm(request.POST)
-       form.save()
-       return HttpResponseRedirect(reverse("homepage", args=[add_author.id]))
+    if request.user.is_staff:
+        if request.method =="POST":
+            form =AddAuthorForm(request.POST)
+            if form.is_valid():
+                data = form.cleaned_data
+                new_user = User.objects.create_user(username=data.get("username"), password=data.get("password"))
+                Author.objects.create(name=data.get("name"), user=new_user, bio=data.get("bio"))
+            return HttpResponseRedirect(reverse("homepage"))
+    else:
+        return HttpResponseForbidden("You don't have permission to make an author")
         
     form = AddAuthorForm()
     return render(request, "generic_form.html", {"form": form})
+
+
+def login_view(request):
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            user = authenticate(request, username=data.get("username"), password=data.get("password"))
+            if user:
+                login(request, user)
+                return HttpResponseRedirect(request.GET.get('next', reverse("homepage")))
+    
+    form = LoginForm()
+    return render(request, "generic_form.html", {"form" : form})
+
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("homepage"))
+
+

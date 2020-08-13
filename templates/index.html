@@ -1,4 +1,7 @@
 <h1>{{ welcome }}</h1>
+{% if request.user.is_authenticated %}
+  <h2> Welcome, {{request.user.author.name}}!!!</h2>
+{% endif%}
 <a href="/addauthor/"> Add Author </a>
 <br>
 <a href="/addrecipe/"> Add Recipe </a>
@@ -8,4 +11,7 @@
             <a href="/recipe/{{ recipes.id }}/">{{recipes.title}}</a>
         </li>
     {%endfor%}
+{% if request.user.is_authenticated %}
+<a href="/logout/"><button>Logout</button></a>
+{% endif %}
 </ul>
