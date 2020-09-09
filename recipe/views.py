@@ -81,3 +81,6 @@ def logout_view(request):
     return HttpResponseRedirect(reverse("homepage"))
 
 
+# TODO form can edit existing recipes that prepopulates with the information of the model being updated
+# TODO logged in user can edit their recipes
+# TODO admin user can edit all recipes
