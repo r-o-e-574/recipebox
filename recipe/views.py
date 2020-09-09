@@ -84,3 +84,7 @@ def logout_view(request):
 # TODO form can edit existing recipes that prepopulates with the information of the model being updated
 # TODO logged in user can edit their recipes
 # TODO admin user can edit all recipes
+# TODO every user has a collection of favorite recipes
+# TODO links to favorites viewable from author detail page
+# TODO all recipes have a favorite button on them
+# TODO favorite button is visible only logged in
