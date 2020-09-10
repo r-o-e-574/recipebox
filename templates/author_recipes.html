@@ -5,12 +5,26 @@
     <h2>About the author:</h2>
     <p>{{author.bio}}</p>
     <br>
-    <h3>Recipes by this author:</h3>
-    {% for recipe in recipes %}
-    <ul>
-        <li>
-           Recipe name: <a href="/recipe/{{recipe.id}}/">{{ recipe.title }}</a>
+    <div id="writtenby">
+        <h3>Recipes by this author:</h3>
+        {% for recipe in recipes %}
+        <ul>
+                <li>
+           recipe: <a href="/recipe/{{recipe.id}}/">{{ recipe.title }}</a>
         </li>
     </ul>
     {%endfor%}
+    </div>
+    <div id="favorite_recipes">
+        <h3>Favorite recipes of this author</h3>
+        {% for fave in favorites %}
+            <ul>
+                <li>
+                    recipe: <a href="/recipe/{{ fave.recipe.id }}/">{{ fave.recipe.title }} </a>    from author <a href="/author/{{ fave.recipe.author.id }}/"> {{ fave.recipe.author.name }}</a>
+                </li>
+            </ul>
+        {% endfor %}
+    </div>
+    <!-- /#favorite_recipes -->
+
 {% endif %}

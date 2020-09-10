@@ -6,5 +6,11 @@
     <h3>Summary: {{recipe.description}}</h3>
     <h3>Cook time: {{ recipe.time_required }} </h3>
     <h4>Instructions:</h4>
-    <p>{{ recipe.instructions }}</p>
+    <pre>{{ recipe.instructions }}</pre>
+    {% if request.user.is_authenticated %}
+        <a href="/recipe/{{ recipe.id }}/favorite/"><button>❤️Favorite</button></a>
+    {% endif %}
+    {% if request.user.is_staff or request.user.author == recipe.author %}
+        <a href="/recipe/{{ recipe.id }}/edit/"><button>🔏Edit</button></a>
+    {% endif %}
 {% endif %}

@@ -1,7 +1,10 @@
 <h1>{{ welcome }}</h1>
 {% if request.user.is_authenticated %}
   <h2> Welcome, {{request.user.author.name}}!!!</h2>
+{% else %}
+    <a href="/login/"><button>Login</button></a>
 {% endif%}
+<br>
 <a href="/addauthor/"> Add Author </a>
 <br>
 <a href="/addrecipe/"> Add Recipe </a>

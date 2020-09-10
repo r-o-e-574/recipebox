@@ -6,8 +6,11 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic import FormView, TemplateView
+from django.contrib.auth import get_user
 
-from recipe.models import Recipe, Author
+from recipe.models import Recipe, Author, Favorite
 from recipe.forms import AddRecipeForm, AddAuthorForm, LoginForm
 # Create your views here.
 
@@ -23,7 +26,10 @@ def recipe_detail(request, recipe_id):
 def author_recipes(request, author_id):
     selected_author = Author.objects.filter(id=author_id).first()
     recipe_list = Recipe.objects.filter(author=selected_author)
-    return render(request, "author_recipes.html", {"recipes": recipe_list, "author": selected_author})
+    favorite_list = Favorite.objects.filter(user=selected_author)
+    return render(request, "author_recipes.html", {"recipes": recipe_list,
+                                                   "author": selected_author,
+                                                   "favorites": favorite_list})
 
 
 @login_required
@@ -79,5 +85,52 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("homepage"))
+
+
+@login_required
+def edit_form_view(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id)
+    if request.method == "POST":
+        form = AddRecipeForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            recipe.title = data.get('title')
+            recipe.description = data.get('description')
+            recipe.time_required = data.get('time_required')
+            recipe.instructions = data.get('instructions')
+            recipe.author = recipe.author
+            recipe.save()
+            return HttpResponseRedirect(reverse("homepage"))
+    else:
+        form = AddRecipeForm(initial={
+            'title': recipe.title,
+            'description': recipe.description,
+            'time_required': recipe.time_required,
+            'instructions': recipe.instructions,
+            'author': recipe.author
+        })
+        return render(request, "generic_form.html", {"form": form})
+
+# TODO form can edit existing recipes that prepopulates with the information of the model being updated
+# TODO logged in user can edit their recipes
+# TODO admin user can edit all recipes
+# TODO every user has a collection of favorite recipes
+# TODO links to favorites viewable from author detail page
+# TODO all recipes have a favorite button on them
+# TODO favorite button is visible only logged in
+
+def add_favorite(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id)
+    user = Author.objects.get(user=request.user)
+    try:
+        if Favorite.objects.filter(user=user).filter(recipe=recipe):
+            return HttpResponseRedirect(reverse('homepage'))
+    except LookupError:
+        pass
+    Favorite.objects.create(
+        user=user,
+        recipe=recipe)
+    return HttpResponseRedirect(reverse('homepage'))
+
 
 
