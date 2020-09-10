@@ -25,8 +25,8 @@ class Recipe(models.Model):
 
 
 class Favorite(models.Model):
-    user = models.ForeignKey(Author)
-    recipe = models.ForeignKey(Recipe)
+    user = models.ForeignKey(Author, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '❤'️
+        return self.recipe
